@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 30pt;
+        margin: 2em;
+      }
+      input[type=text] {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        font-size: 30pt;
+        padding: 5px 10px;
+        text-align: right;
+      }
+      .currency-container {
+        margin: 10px;
+      }
+      .currency-symbol {
+        display: inline-block;
+        text-align: center;
+        width: 30px;
+      }
+      #message {
+        color: #f88;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="currency-container">
+      <span class="currency-symbol">$</span>
+      <input type="text" size="6" placeholder="Dollars" id="dollars" />
+    </div>
+    <div class="currency-container">
+      <span class="currency-symbol">&#x20A2;</span>
+      <input type="text" size="6" placeholder="Credits" id="credits" />
+    </div>
+    <div id="message"></div>
+    <script type="text/javascript">
+      var dollarsInput = document.getElementById('dollars');
+      var creditsInput = document.getElementById('credits');
+      var message = document.getElementById('message');
+      function clear() {
+        dollarsInput.value = '';
+        creditsInput.value = '';
+        message.innerHTML = '';
+      }
+      // Converter dollars to credits.
+      dollarsInput.addEventListener('keyup', function(ev) {
+        if (dollarsInput.value.match(/^\s*$/)) { clear(); return; }
+        var dollars = Number(dollarsInput.value.replace(/,/g,''));
+        if (isNaN(dollars)) {
+          creditsInput.value = '';
+          message.innerHTML = 'Invalid dollar amount "' + dollarsInput.value + '".';
+          return;
+        }
+        message.innerHTML = '';
+        creditsInput.value = commify(Math.floor(dollars * 20));
+      });
+      dollarsInput.addEventListener('focus', function() { this.select(); });
+      dollarsInput.focus();
+      // Converter credits to dollars.
+      creditsInput.addEventListener('keyup', function(ev) {
+        if (creditsInput.value.match(/^\s*$/)) { clear(); return; }
+        var credits = Number(creditsInput.value.replace(/,/g,''));
+        if (isNaN(credits)) {
+          dollarsInput.value = '';
+          message.innerHTML = 'Invalid credit amount "' + creditsInput.value + '".';
+          return;
+        }
+        message.innerHTML = '';
+        dollarsInput.value = (credits / 20).toFixed(2);
+      });
+      creditsInput.addEventListener('focus', function() { this.select(); });
+      function commify(x) {
+        return (x).toString().split('').reverse().join('').replace(/(\d{3})/g, '$1,').split('').reverse().join('').replace(/^,/,'');
+      }
+    </script>
+  </body>
+</html>
