@@ -36,45 +36,45 @@
     </div>
     <div class="currency-container">
       <span class="currency-symbol">&#x20B8;</span>
-      <input type="text" size="6" placeholder="Tokens" id="credits" />
+      <input type="text" size="6" placeholder="Tokens" id="tokens" />
     </div>
     <div id="message"></div>
     <script type="text/javascript">
       var dollarsInput = document.getElementById('dollars');
-      var creditsInput = document.getElementById('credits');
+      var tokensInput = document.getElementById('tokens');
       var message = document.getElementById('message');
       function clear() {
         dollarsInput.value = '';
-        creditsInput.value = '';
+        tokensInput.value = '';
         message.innerHTML = '';
       }
-      // Converter dollars to credits.
+      // Converter dollars to tokens.
       dollarsInput.addEventListener('keyup', function(ev) {
         if (dollarsInput.value.match(/^\s*$/)) { clear(); return; }
         var dollars = Number(dollarsInput.value.replace(/,/g,''));
         if (isNaN(dollars)) {
-          creditsInput.value = '';
+          tokensInput.value = '';
           message.innerHTML = 'Invalid dollar amount "' + dollarsInput.value + '".';
           return;
         }
         message.innerHTML = '';
-        creditsInput.value = commify(Math.floor(dollars * 20));
+        tokensInput.value = commify(Math.floor(dollars * 20));
       });
       dollarsInput.addEventListener('focus', function() { this.select(); });
       dollarsInput.focus();
-      // Converter credits to dollars.
-      creditsInput.addEventListener('keyup', function(ev) {
-        if (creditsInput.value.match(/^\s*$/)) { clear(); return; }
-        var credits = Number(creditsInput.value.replace(/,/g,''));
-        if (isNaN(credits)) {
+      // Converter tokens to dollars.
+      tokensInput.addEventListener('keyup', function(ev) {
+        if (tokensInput.value.match(/^\s*$/)) { clear(); return; }
+        var tokens = Number(tokensInput.value.replace(/,/g,''));
+        if (isNaN(tokens)) {
           dollarsInput.value = '';
-          message.innerHTML = 'Invalid credit amount "' + creditsInput.value + '".';
+          message.innerHTML = 'Invalid tokens amount "' + tokensInput.value + '".';
           return;
         }
         message.innerHTML = '';
-        dollarsInput.value = (credits / 20).toFixed(2);
+        dollarsInput.value = (tokens / 20).toFixed(2);
       });
-      creditsInput.addEventListener('focus', function() { this.select(); });
+      tokensInput.addEventListener('focus', function() { this.select(); });
       function commify(x) {
         return (x).toString().split('').reverse().join('').replace(/(\d{3})/g, '$1,').split('').reverse().join('').replace(/^,/,'');
       }
