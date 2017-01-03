@@ -10,10 +10,7 @@
     <script>
       function MetatronsCube(canvas) {
         this.canvas = canvas;
-        this.midpoint = {
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-        }
+        this.midpoint = { x: canvas.width/2, y: canvas.height/2 };
         this.size = 80;
         this.circles = [
           new Circle(this.midpoint.x, this.midpoint.y, this.size), // Center.
@@ -21,36 +18,30 @@
       }
 
       MetatronsCube.prototype.draw = function() {
-        var ctx = this.canvas.getContext('2d');
+        var cube=this, ctx=cube.canvas.getContext('2d'), did={};
         ctx.beginPath();
-        // Draw the cirles.
-        this.circles.forEach(function (circle) {
-          circle.draw(ctx);
-        });
-        // Connect the centers.
-        var did = {};
-        for (var i=0; i<this.circles.length; i++) {
-          for (var j=0; j<this.circles.length; j++) {
+        cube.circles.forEach(function (c1, i) {
+          c1.draw(ctx); // Draw the circles.
+          cube.circles.forEach(function (c2, j) {
             var them = (i<j) ? String(i)+j : String(j)+i;
-            if ((i === j) || did[them]) { continue; }
-            this.circles[i].connectTo(this.circles[j], ctx);
+            if ((i === j) || did[them]) { return; }
+            c1.connectTo(c2, ctx); // Connect the centers.
             did[them] = true;
-          }
-        }
+          })
+        })
         ctx.stroke();
       };
 
       MetatronsCube.prototype.makeRings = function(layer) {
-        var that = this;
-        var mss = [[1,-1],[1,-1],[1,1],[1,1],[-1,1],[-1,-1]];
-        return mss.map(function (ms, i) {
+        var rqs = [[1,-1],[1,-1],[1,1],[1,1],[-1,1],[-1,-1]];
+        return rqs.map(function (rq, i) {
           var p = (i%3==0) ? 0 : 1/3;
           return new Circle(
-            that.midpoint.x + ms[0] * (layer * Math.sin(Math.PI * p) * that.size),
-            that.midpoint.y + ms[1] * (layer * Math.cos(Math.PI * p) * that.size),
-            that.size
+            this.midpoint.x + rq[0] * (layer * Math.sin(Math.PI * p) * this.size),
+            this.midpoint.y + rq[1] * (layer * Math.cos(Math.PI * p) * this.size),
+            this.size
           );
-        });
+        }.bind(this));
       }
 
       function Circle(x, y, r) {
