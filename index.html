@@ -10,6 +10,7 @@
     <script>
       function MetatronsCube(canvas) {
         this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
         this.midpoint = { x: canvas.width/2, y: canvas.height/2 };
         this.size = 80;
         this.circles = [
@@ -17,8 +18,8 @@
         ].concat(this.makeRings(2)).concat(this.makeRings(4));
       }
 
-      MetatronsCube.prototype.draw = function() {
-        var cube=this, ctx=cube.canvas.getContext('2d'), did={};
+      MetatronsCube.prototype.draw = function(beforeStroke) {
+        var cube=this, ctx=cube.ctx, did={};
         ctx.beginPath();
         cube.circles.forEach(function (c1, i) {
           c1.draw(ctx); // Draw the circles.
@@ -29,6 +30,7 @@
             did[them] = true;
           })
         })
+        if (typeof(beforeStroke) === 'function') { beforeStroke(ctx); }
         ctx.stroke();
       };
 
@@ -60,9 +62,67 @@
         ctx.lineTo(that.x, that.y);
       };
 
+      function WanderingColor() {
+        this.values = [0,0,0];
+        this.pickChannel = function() { return Math.floor(Math.random() * 3); };
+        this.channel = this.pickChannel();
+        this.goingUp = true;
+      }
+
+      WanderingColor.prototype.update = function() {
+        this.values[this.channel] += (this.goingUp) ? 1 : -1;
+        var value = this.values[this.channel];
+        if ((this.goingUp && (value >= 0xff)) || (!this.goingUp && (value <= 0))) {
+          this.channel = this.pickChannel();
+          this.goingUp = (this.values[this.channel] === 0);
+        }
+        return this.toString();
+      };
+
+      WanderingColor.prototype.toString = function() {
+        return '#' + this.values.map(function(x) {
+          var hex = x.toString(16);
+          return ((hex.length < 2) ? '0' : '') + hex;
+        }).join('');
+      };
+
       // Draw Metatron's cube on the canvas.
       var canvas = document.getElementById('canvas');
-      new MetatronsCube(canvas).draw();
+      canvas.onclick = function()  {
+        if (running) {
+          window.cancelAnimationFrame(lastFrame);
+        } else {
+          lastFrame = window.requestAnimationFrame(animate);
+        }
+        running = !running;
+      };
+      var mc = new MetatronsCube(canvas);
+      var lastFrame;
+      var wc = new WanderingColor(), wc2 = new WanderingColor(), wc3 = new WanderingColor();
+      var running = true;
+      mc.ctx.lineCap = 'round';
+      var width=5, width2=3;
+      function animate() {
+        mc.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        mc.ctx.translate(this.canvas.width/2, this.canvas.height/2);
+        mc.ctx.rotate(0.005);
+        mc.ctx.translate(-this.canvas.width/2, -this.canvas.height/2);
+        mc.draw(function (ctx) {
+          ctx.strokeStyle = wc3.update();
+          ctx.lineWidth = (width += 0.01);
+        });
+        mc.draw(function (ctx) {
+          ctx.strokeStyle = wc2.update();
+          ctx.lineWidth = (width2 += 0.005);
+        });
+        mc.draw(function (ctx) {
+          ctx.strokeStyle = wc.update();
+          ctx.lineWidth = 3;
+        });
+        lastFrame = window.requestAnimationFrame(animate);
+      };
+      lastFrame = window.requestAnimationFrame(animate);
+
     </script>
   </body>
 </html>
