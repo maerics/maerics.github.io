@@ -105,7 +105,7 @@
       function animate() {
         mc.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         mc.ctx.translate(this.canvas.width/2, this.canvas.height/2);
-        mc.ctx.rotate(0.005);
+        // mc.ctx.rotate(0.005);
         mc.ctx.translate(-this.canvas.width/2, -this.canvas.height/2);
         mc.draw(function (ctx) {
           ctx.strokeStyle = wc3.update();
