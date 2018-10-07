@@ -20,17 +20,20 @@
           var main = this;
 
           main.user = {};
+
+          main.login = {};
           main.checkLogin = function() {
             console.log('OK: checkLogin');
-            FB.getLoginStatus(
-              function success(response) {
-                  console.log('checkLogin: OK:', response);
-                  main.login = { response: response };
-              },
-              function failure(response) {
-                  console.log('checkLogin: ERR:', arguments);
-                  main.login = { response: response };
+            try {
+              FB.getLoginStatus(function(response) {
+                console.log('checkLogin: OK:', response);
+                main.login = { response: response };
               });
+            } catch (err) {
+              main.login = {
+                exception: err.message,
+              };
+            }
           };
         });
     </script>
@@ -67,9 +70,9 @@
         <button class="btn btn-primary" ng-click="main.checkLogin()">
           Check Login Status
         </button>
-        <div ng-if="main.login.response">
-          <label>Response</label>
-          <pre>{{ main.login.response | json }}</pre>
+        <span style="padding-left: 1em; ">
+          <b>Login Status:</b>
+          <code>{{ main.login | json }}</code>
         </div>
       </div>
 
