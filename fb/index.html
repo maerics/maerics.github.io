@@ -26,10 +26,12 @@
           main.checkLogin = function() {
             console.log('OK: checkLogin');
             try {
-              FB.getLoginStatus($scope.$apply(function(response) {
+              FB.getLoginStatus(function(response) {
                 console.log('checkLogin: OK:', response);
-                main.login = { response: response };
-              }));
+                $scope.$apply(function() {
+                  main.login = { response: response };
+                })
+              });
             } catch (err) {
               main.login = {
                 exception: err.message,
