@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+  <head>
+    <title>FB</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <style>
+      body { margin: 2em; }
+      div { margin: 1em; }
+    </style>
+  </head>
+  <body ng-app="fap">
+    <script>
+      angular
+        .module('fap', [])
+        .controller('MainCtrl', function() {
+          var main = this;
+
+          main.user = {};
+          main.checkLogin = function() {
+            console.log('OK: checkLogin');
+            FB.getLoginStatus(
+              function success(response) {
+                  console.log('checkLogin: OK:', response);
+                  main.login = { response: response };
+              },
+              function failure(response) {
+                  console.log('checkLogin: ERR:', arguments);
+                  main.login = { response: response };
+              });
+          };
+        });
+    </script>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId:   '495626720915083',
+          cookie:  true,
+          xfbml:   true,
+          version: 'v3.1',
+        });
+        FB.AppEvents.logPageView();   
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "https://connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    <!-- Body HTML content. -->
+    <div ng-controller="MainCtrl as main">
+      <h1>Facebook API Playground</h1>
+
+      <div class="lead">
+        Let's play with the Facebook APIs!
+      </div>
+    
+      <h3>Facebook Login Status</h3>
+      <div>
+        <button class="btn btn-primary" ng-click="main.checkLogin()">
+          Check Login Status
+        </button>
+        <div ng-if="main.login.response">
+          <label>Response</label>
+          <pre>{{ main.login.response | json }}</pre>
+        </div>
+      </div>
+
+      <h3>Angular Playground</h3>
+      <form>
+        <div class="form-group">
+          <label for="userName">What is your name?</label>
+          <input type="text" class="form-control" id="userName" placeholder="Enter your name" ng-model="main.user.name">
+          <small class="form-text text-muted">Hello, {{ main.user.name || 'user' }}!</small>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
