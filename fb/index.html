@@ -105,8 +105,8 @@
       <div class="section" ng-if="!main.login">
         <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
       </div>
-      <div class="section" ng-if="main.login.status == 'connected'">
-        <button class="btn btn-tiny btn-primary" ng-click="main.logout">Logout</button>
+      <div class="section">
+        <button class="btn btn-sm btn-primary" ng-click="main.logout()">Logout</button>
       </div>
 
       <h3>Angular Playground</h3>
