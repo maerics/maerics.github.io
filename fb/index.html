@@ -24,14 +24,18 @@
 
           main.login = {};
 
+          main.logout = function() {
+            FB.logout(function(response) {
+              console.log('OK: logged out:', response);
+            });
+          };
+
           main.checkLogin = function() {
             console.log('OK: checkLogin');
             try {
               FB.getLoginStatus(function(response) {
                 console.log('checkLogin: OK:', response);
-                $scope.$apply(function() {
-                  main.login = { response: response };
-                });
+                main.login = { response: response };
               });
             } catch (err) {
               main.login = {
@@ -100,6 +104,9 @@
       </div>
       <div class="section" ng-if="!main.login">
         <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+      </div>
+      <div class="section" ng-if="main.login.status == 'connected'">
+        <button class="btn btn-tiny btn-primary" ng-click="main.logout">Logout</button>
       </div>
 
       <h3>Angular Playground</h3>
