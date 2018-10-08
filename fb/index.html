@@ -19,8 +19,9 @@
       angular
         .module('fap', [])
         .run(function($window) {
-          console.log('OK: setting initializer');
+          console.log('OK: setting FB initializer');
           $window.fbAsyncInit = function() {
+            console.log('OK: calling FB initializer');
             FB.init({
               appId:   '495626720915083',
               cookie:  true,
@@ -29,42 +30,45 @@
             });
           };
         })
-        .controller('MainCtrl', function($scope) {
+        .factory('fbService', function($q) {
+          const doPromise = function(f) {
+            var deferred = $q.defer();
+            f(function(response) {
+              if (!response || response.error) {
+                return deferred.reject(response.error);
+              }
+              return deferred.resolve(response);
+            });
+            return deferred.promise;
+          };
+
+          return {
+            login:          doPromise(r => FB.login(r)),
+            logout:         doPromise(r => FB.logout(r)),
+            getLoginStatus: doPromise(r => FB.getLoginStatus(r)),
+            getUserInfo:    doPromise(r => FB.api('/me', {fields:'name,email'}, r)),
+            getUserPicture: (userId) => doPromise(r => FB.api("/${userId}/picture", 'GET', {}, r)),
+          }
+        })
+        .controller('MainCtrl', function($scope, fbService) {
           var main = this;
 
           main.user = {};
 
-          main.logout = function() {
-            FB.logout(function(response) {
-              console.log('OK: logged out:', response);
+          main.getLoginStatus = fbService.getLoginStatus
+            .then(function(res) {
+              console.log('OK: getLoginStatus=', res);
             });
-          };
 
-          main.login = function() {
-            console.log('OK: main.login');
-            console.log('OK: FB.getLoginStatus');
-            try {
-              FB.getLoginStatus(function(response) {
-                console.log('OK: FB.getLoginStatus:', response);
-                main.login = { response: response };
-                FB.login(function(response) {
-                  if (response.authResponse) {
-                    console.log('OK: FB.login');
-                    FB.api('/me', function(response) {
-                      FB.api('/me?locale=en_US&fields=name,email', function(res) {
-                        console.log('OK: me=', res);
-                        main.user = res;
-                      });
-                    });
-                  } else {
-                   console.log('User cancelled login or did not fully authorize.');
-                  }
-                });
-              });
-            } catch (err) {
-              main.login = { exception: err.message };
-            }
-          };
+          main.login = fbService.login
+            .then(function(res) {
+              console.log('OK: login=', res);
+            });
+
+          main.logout = fbService.logout
+            .then(function(res) {
+              console.log('OK: logout=', res);
+            });
 
           main.login();
         });
@@ -81,6 +85,7 @@ login = {{ main.user | json }};</pre>
       </div>
 
       <div class="section">
+        <button class="btn btn-sm btn-primary" ng-click="main.getLoginStatus()">Check Login Status</button>
         <button class="btn btn-sm btn-primary" ng-click="main.login()">Login using Facebook</button>
         <button class="btn btn-sm btn-primary" ng-click="main.logout()">Logout</button>
       </div>
