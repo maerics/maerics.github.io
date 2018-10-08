@@ -23,6 +23,7 @@
           main.user = {};
 
           main.login = {};
+
           main.checkLogin = function() {
             console.log('OK: checkLogin');
             try {
@@ -38,6 +39,7 @@
               };
             }
           };
+          main.checkLogin();
         });
     </script>
     <script>
@@ -86,11 +88,12 @@
       <h3>Facebook Login Status</h3>
       <div class="section">
         <button class="btn btn-primary" ng-click="main.checkLogin()">
-          Check Login Status
+          Reload Login Status
         </button>
-        <span style="margin-left: 1em; ">
+        <div>
           <b>Login Status:</b>
-          <code>{{ main.login | json }}</code>
+          <pre ng-if="main.login">{{ main.login | json }}</pre>
+          <div ng-if="!main.login">Loading...</div>
         </div>
       </div>
       <div class="section">
