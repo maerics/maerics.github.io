@@ -19,6 +19,7 @@
         .module('fap', [])
         .factory('fbService', function($q, $rootScope, $window) {
           $rootScope.fb = {
+            updatedAt: new Date(),
             user: null,
             login: null,
           };
@@ -51,10 +52,15 @@
             ready:   fbLoaded.promise,
             resolve: fbLoaded.resolve,
 
-            me:             p('me',             r => FB.api('/me?fields=name,email,picture', r), result => $rootScope.fb.user = result),
+            me:             p('me',             r => FB.api('/me?fields=name,email,picture', r), function(result) {
+              $rootScope.fb.updatedAt = new Date()
+              $rootScope.fb.user = result;
+              return result;
+            })
             login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
             logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
             getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), function(result) {
+              $rootScope.fb.updatedAt = new Date()
               $rootScope.fb.login = result;
               if (result.status === 'connected') {
                 return fbService.me().then(result);
@@ -109,7 +115,7 @@
         <h1 class="display-4">Checking Facebook Login...</h1>
       </div>
 
-      <div ng-if="!fb.user">
+      <div ng-if="fb.login && !fb.user">
         <h1 class="display-4">Welcome, User!</h1>
       </div>
 
