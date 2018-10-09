@@ -19,8 +19,8 @@
         .module('fap', [])
         .factory('fbService', function($q, $rootScope, $window) {
           $rootScope.fb = {
-            loginStatus: null,
             user: null,
+            loginStatus: null,
           };
 
           var fbLoaded = $q.defer();
@@ -53,7 +53,15 @@
 
             login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
             logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
-            getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), result => $rootScope.fb.loginStatus = result),
+            getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), function(result) {
+              $rootScope.fb.loginStatus = result;
+              if (result.status === 'connected') {
+                return fbService.api('/me?fields=name,email')
+                  .then(me => $rootScope.fb.user = me)
+                  .then(result);
+              }
+              return result;
+            }),
           };
           return fbService;
         })
