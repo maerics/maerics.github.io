@@ -52,6 +52,7 @@
             resolve: fbLoaded.resolve,
 
             me:             p('me',             r => FB.api('/me?fields=name,email', r), result => $rootScope.fb.user = result),
+            picture:        p('picture',        r => FB.api(`/${$rootScope.fb.user.id}/picture`, r)),
             login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
             logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
             getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), function(result) {
@@ -119,9 +120,14 @@
         <button class="btn btn-sm btn-primary" ng-click="main.logout()" ng-if="fb.login.status === 'connected'">
           Logout
         </button>
-        <button class="btn btn-sm btn-primary" ng-click="main.getLoginStatus()">
-          Check Login Status
+        <button class="btn btn-sm btn-link" ng-click="main.getLoginStatus()">
+          Reload Login Status
         </button>
+      </div>
+
+      <div class="section" ng-if="fb.user">
+        <h3>Hello, {{ fb.user.name }}!</h3>
+        <div>Your email address is {{ fb.user.email }}</div>
       </div>
     </div>
   </body>
