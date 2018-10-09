@@ -59,6 +59,7 @@
               if (result.status === 'connected') {
                 return fbService.me().then(result);
               }
+              $rootScope.fb.user = null;
               return result;
             }),
           };
