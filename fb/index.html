@@ -123,9 +123,12 @@
       <div class="section" ng-if="fb.user">
         <h3>Hello, {{ fb.user.name }}!</h3>
         <div style="float: left; ">
-          <img height="{{ fb.user.picture.data.height }}" width="{{ fb.user.picture.data.width }}" src="{{ fb.user.picture.data.url }}">
+          <img style="1px solid black; margin: 5px; "
+               height="{{ fb.user.picture.data.height }}"
+               width="{{ fb.user.picture.data.width }}"
+               src="{{ fb.user.picture.data.url }}">
         </div>
-        <div>Your email address is<br><b>{{ fb.user.email }}</b></div>
+        <div>Your email address is<br><b>{{ fb.user.email }}</b><br clear="all"></div>
       </div>
 
       <div class="section" ng-init="main.showingStatus=false">
