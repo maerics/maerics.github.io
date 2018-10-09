@@ -21,10 +21,10 @@
           var fbLoaded = $q.defer();
 
           function p(name, fn) {
-            var deferred = $q.defer();
             return () => fbLoaded.promise
               .then(function() {
                 console.log(`OK: entered ${name}`);
+                var deferred = $q.defer();
                 try {
                   return fn(function(result) {
                     console.log('???: result=', result);
