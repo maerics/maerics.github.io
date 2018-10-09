@@ -15,11 +15,13 @@
   </head>
   <body ng-app="fap">
     <script>
+      var fbLoaded;
       angular
         .module('fap', [])
-        .run(function($window) {
+        .run(function($window, $q) {
           // Setup the init function.
           console.log('OK: setting FB initializer');
+          fbLoaded = $q.defer();
           $window.fbAsyncInit = function() {
             console.log('OK: calling FB initializer - LOADED');
             FB.init({
@@ -29,6 +31,7 @@
               version: 'v3.1',
             });
             console.log('OK: FB=', $window.FB);
+            fbLoaded.resolve();
           };
           // Load the Facebook JS SDK.
           (function(d, s, id){
@@ -53,7 +56,8 @@
             return deferred.promise;
           }
 
-          main.getLoginStatus = getLoginStatus()
+          main.getLoginStatus = fbLoaded.promise
+            .then(getLoginStatus)
             .then(function(result) {
               console.log('OK: resolved:', result);
               main.loginStatus = result;
