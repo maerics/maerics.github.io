@@ -47,6 +47,7 @@
             ready:   fbLoaded.promise,
             resolve: fbLoaded.resolve,
 
+            logout:         p('logout',         r => FB.logout(r)),
             getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r)),
           };
           return fbService;
@@ -83,12 +84,15 @@
           main.getLoginStatus = function() {
             return fbService.getLoginStatus()
               .then(function(result) {
-                console.log('---- OK: login status:', result);
                 main.loginStatus = result;
                 main.loginStatusPretty = JSON.stringify(result, null, 2);
-                console.log('---- OK: main.loginStatusPretty=', main.loginStatusPretty)
               });
-          }
+          };
+
+          main.logout = function() {
+            return fbService.logout()
+              .then(main.getLoginStatus);
+          };
         })
     </script>
 
