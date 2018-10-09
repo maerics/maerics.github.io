@@ -56,7 +56,7 @@
               $rootScope.fb.updatedAt = new Date()
               $rootScope.fb.user = result;
               return result;
-            })
+            }),
             login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
             logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
             getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), function(result) {
