@@ -46,13 +46,11 @@
 
           function getLoginStatus() {
             console.log('OK: getLoginStatus');
-            if ($window.FB) {
-              var deferred = $q.defer;
-              $window.FB.getLoginStatus(function(r) {
-                deferred[(r && !r.error) ? 'resolve' : 'reject'](r);
-              });
-              return deferred.promise;
-            }
+            var deferred = $q.defer;
+            $window.FB.getLoginStatus(function(r) {
+              deferred[(r && !r.error) ? 'resolve' : 'reject'](r);
+            });
+            return deferred.promise;
           }
 
           main.getLoginStatus = getLoginStatus()
