@@ -7,7 +7,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="https://connect.facebook.net/en_US/sdk.js"></script>
     <style>
       body { margin: 2em; }
       div { margin-bottom: 1em; }
@@ -19,59 +18,47 @@
       angular
         .module('fap', [])
         .run(function($window) {
+          // Setup the init function.
           console.log('OK: setting FB initializer');
           $window.fbAsyncInit = function() {
-            console.log('OK: calling FB initializer');
+            console.log('OK: calling FB initializer - LOADED');
             FB.init({
-              appId:   '495626720915083',
-              cookie:  true,
-              xfbml:   true,
+              appId: '495626720915083',
+              cookie: true,
+              xfbml: true,
               version: 'v3.1',
             });
+            console.log('OK: FB=', $window.FB);
           };
+          // Load the Facebook JS SDK.
+          (function(d, s, id){
+             var js, fjs = d.getElementsByTagName(s)[0];
+             if (d.getElementById(id)) {return;}
+             js = d.createElement(s); js.id = id;
+             js.src = "https://connect.facebook.net/en_US/sdk.js";
+             fjs.parentNode.insertBefore(js, fjs);
+           }(document, 'script', 'facebook-jssdk'));
         })
-        .factory('fbService', function($q) {
-          const doPromise = function(f) {
-            var deferred = $q.defer();
-            f(function(response) {
-              if (!response || response.error) {
-                return deferred.reject(response.error);
-              }
-              return deferred.resolve(response);
-            });
-            return deferred.promise;
-          };
-
-          return {
-            login:          doPromise(r => FB.login(r)),
-            logout:         doPromise(r => FB.logout(r)),
-            getLoginStatus: doPromise(r => FB.getLoginStatus(r)),
-            getUserInfo:    doPromise(r => FB.api('/me', {fields:'name,email'}, r)),
-            getUserPicture: (userId) => doPromise(r => FB.api("/${userId}/picture", 'GET', {}, r)),
-          }
-        })
-        .controller('MainCtrl', function($scope, fbService) {
+        .controller('MainCtrl', function($scope, $q, $window) {
           var main = this;
 
-          main.user = {};
+          main.loginStatus = {};
 
-          main.getLoginStatus = fbService.getLoginStatus
-            .then(function(res) {
-              console.log('OK: getLoginStatus=', res);
-            });
-
-          main.login = fbService.login
-            .then(function(res) {
-              console.log('OK: login=', res);
-            });
-
-          main.logout = fbService.logout
-            .then(function(res) {
-              console.log('OK: logout=', res);
-            });
-
-          main.login();
-        });
+          main.getLoginStatus = function() {
+            console.log('OK: getLoginStatus');
+            if ($window.FB) {
+              var deferred = $q.defer;
+              $window.FB.getLoginStatus(function(res) {
+                var fn = (res && !res.error) ? 'resolve' : 'reject';
+                return deferred[fn](res);
+              })
+              deferred.promise
+                .then(function(result) {
+                  main.loginStatus = result;
+                });
+            }
+          };
+        })
     </script>
 
     <!-- Body HTML content. -->
@@ -80,8 +67,7 @@
 
       <div class="section">
         <b>Facebook Status:</b>
-        <pre>user = {{ main.user | json }};
-login = {{ main.user | json }};</pre>
+        <pre>loginStatus = {{ main.loginStatus }};</pre>
       </div>
 
       <div class="section">
