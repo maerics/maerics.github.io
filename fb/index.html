@@ -25,18 +25,21 @@
             return () => fbLoaded.promise
               .then(function() {
                 console.log(`OK: entered ${name}`);
-                return fn(function(result) {
-                  $window.FB.getLoginStatus(function(r) {
-                    if (r && !r.error) {
-                      console.log(`OK: resolved ${name}`, r);
-                      return deferred.resolve(r);
+                try {
+                  return fn(function(result) {
+                    console.log('???: result=', result);
+                    if (result && !result.error) {
+                      console.log(`OK: resolved ${name}`, result);
+                      return deferred.resolve(result);
                     }
-                    console.log(`ERR: rejected ${name}`, r);
-                    return deferred.reject(r);
+                    console.log(`ERR: rejected ${name}`, result);
+                    return deferred.reject(result);
                   });
-                  console.log(`OK: promised ${name}`);
-                  return deferred.promise;
-                });
+                } catch (err) {
+                  deferred.reject(err);
+                }
+                console.log(`OK: promised ${name}`);
+                return deferred.promise;
               });
           }
 
