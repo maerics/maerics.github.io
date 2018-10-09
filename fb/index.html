@@ -17,17 +17,21 @@
     <script>
       angular
         .module('fap', [])
-        .factory('fbService', function($q, $window) {
+        .factory('fbService', function($q, $rootScope, $window) {
+          $rootScope.fb = {
+            loginStatus: null,
+            user: null,
+          };
+
           var fbLoaded = $q.defer();
 
-          function p(name, fn) {
+          function p(name, fn, after) {
             return () => fbLoaded.promise
               .then(function() {
                 console.log(`OK: entered ${name}`);
                 var deferred = $q.defer();
                 try {
                   fn(function(result) {
-                    console.log('???: result=', result);
                     if (result && !result.error) {
                       console.log(`OK: resolved ${name}`, result);
                       return deferred.resolve(result);
@@ -39,7 +43,7 @@
                   deferred.reject(err);
                 }
                 console.log(`OK: promised ${name}`);
-                return deferred.promise;
+                return after ? deferred.promise.then(after) : deferred.promise;
               });
           }
 
@@ -47,8 +51,9 @@
             ready:   fbLoaded.promise,
             resolve: fbLoaded.resolve,
 
-            logout:         p('logout',         r => FB.logout(r)),
-            getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r)),
+            login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
+            logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
+            getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), result => $rootScope.fb.loginStatus = result),
           };
           return fbService;
         })
@@ -63,7 +68,8 @@
               xfbml: true,
               version: 'v3.1',
             });
-            fbService.resolve($window.FB);
+            fbService.resolve();
+            fbService.ready.then(fbService.getLoginStatus);
             console.log('OK: FB SDK loaded');
           };
           // Load the Facebook JS SDK.
@@ -75,24 +81,17 @@
              fjs.parentNode.insertBefore(js, fjs);
            }(document, 'script', 'facebook-jssdk'));
         })
+        .filter('jsonpp', function() {
+          return function(obj) {
+            return JSON.stringify(obj, null, 2);
+          };
+        })
         .controller('MainCtrl', function(fbService, $scope, $q, $window) {
           var main = this;
 
-          main.loginStatus = {};
-          main.loginStatusPretty = '{}';
-
-          main.getLoginStatus = function() {
-            return fbService.getLoginStatus()
-              .then(function(result) {
-                main.loginStatus = result;
-                main.loginStatusPretty = JSON.stringify(result, null, 2);
-              });
-          };
-
-          main.logout = function() {
-            return fbService.logout()
-              .then(main.getLoginStatus);
-          };
+          main.login          = fbService.login;
+          main.logout         = fbService.logout;
+          main.getLoginStatus = fbService.getLoginStatus;
         })
     </script>
 
@@ -102,7 +101,7 @@
 
       <div class="section">
         <b>Facebook Status:</b>
-        <pre>loginStatus = {{ main.loginStatusPretty }};</pre>
+        <pre>{{ fb | jsonpp }};</pre>
       </div>
 
       <div class="section">
