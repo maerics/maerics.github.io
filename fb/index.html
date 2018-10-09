@@ -115,9 +115,6 @@
         <button class="btn btn-sm btn-primary" ng-click="main.logout()" ng-if="fb.login.status === 'connected'">
           Logout
         </button>
-        <button class="btn btn-sm btn-info" ng-click="main.picture()">
-          Load Picture
-        </button>
         <button class="btn btn-sm btn-link" ng-click="main.getLoginStatus()">
           Reload Login Status
         </button>
@@ -125,10 +122,13 @@
 
       <div class="section" ng-if="fb.user">
         <h3>Hello, {{ fb.user.name }}!</h3>
-        <div>Your email address is {{ fb.user.email }}</div>
+        <div style="float: left; ">
+          <img height="{{ fb.user.picture.data.height }}" width="{{ fb.user.picture.data.width }}" src="{{ fb.user.picture.data.url }}">
+        </div>
+        <div>Your email address is<br><b>{{ fb.user.email }}</b></div>
       </div>
 
-      <div class="section" ng-init="main.showingStatus=true">
+      <div class="section" ng-init="main.showingStatus=false">
         <span>
           <b>Facebook Status:</b>
           <a href="#" class="badge badge-primary" ng-if="!main.showingStatus" ng-click="main.showingStatus=true">Show</a>
