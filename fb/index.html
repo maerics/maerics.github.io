@@ -80,9 +80,10 @@
           main.getLoginStatus = function() {
             return fbService.getLoginStatus()
               .then(function(result) {
-                console.log('OK: login status:', result);
+                console.log('---- OK: login status:', result);
                 main.loginStatus = result;
                 main.loginStatusPretty = JSON.stringify(result, null, 2);
+                console.log('---- OK: main.loginStatusPretty=', main.loginStatusPretty)
               });
           }
         })
