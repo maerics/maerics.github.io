@@ -15,23 +15,52 @@
   </head>
   <body ng-app="fap">
     <script>
-      var fbLoaded;
       angular
         .module('fap', [])
-        .run(function($window, $q) {
+        .factory('fbService', function($q, $window) {
+          var fbLoaded = $q.defer();
+
+          function p(name, fn) {
+            var deferred = $q.defer();
+            return () => fbLoaded.promise
+              .then(function() {
+                console.log(`OK: entered ${name}`);
+                return fn(function(result) {
+                  $window.FB.getLoginStatus(function(r) {
+                    if (r && !r.error) {
+                      console.log(`OK: resolved ${name}`, r);
+                      return deferred.resolve(r);
+                    }
+                    console.log(`ERR: rejected ${name}`, r);
+                    return deferred.reject(r);
+                  });
+                  console.log(`OK: promised ${name}`);
+                  return deferred.promise;
+                });
+              });
+          }
+
+          var fbService = {
+            ready:   fbLoaded.promise,
+            resolve: fbLoaded.resolve,
+
+            getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r)),
+          };
+          return fbService;
+        })
+        .run(function($window, fbService) {
           // Setup the init function.
           console.log('OK: setting FB initializer');
-          fbLoaded = $q.defer();
           $window.fbAsyncInit = function() {
-            console.log('OK: calling FB initializer - LOADED');
+            console.log('OK: calling FB initializer');
             FB.init({
               appId: '495626720915083',
               cookie: true,
               xfbml: true,
               version: 'v3.1',
             });
-            console.log('OK: FB=', $window.FB);
-            fbLoaded.resolve();
+            fbService.resolve($window.FB);
+            console.log('OK: FB SDK loaded');
           };
           // Load the Facebook JS SDK.
           (function(d, s, id){
@@ -42,26 +71,20 @@
              fjs.parentNode.insertBefore(js, fjs);
            }(document, 'script', 'facebook-jssdk'));
         })
-        .controller('MainCtrl', function($scope, $q, $window) {
+        .controller('MainCtrl', function(fbService, $scope, $q, $window) {
           var main = this;
 
           main.loginStatus = {};
+          main.loginStatusPretty = '{}';
 
-          function getLoginStatus() {
-            console.log('OK: getLoginStatus');
-            var deferred = $q.defer();
-            $window.FB.getLoginStatus(function(r) {
-              deferred[(r && !r.error) ? 'resolve' : 'reject'](r);
-            });
-            return deferred.promise;
+          main.getLoginStatus = function() {
+            return fbService.getLoginStatus()
+              .then(function(result) {
+                console.log('OK: login status:', result);
+                main.loginStatus = result;
+                main.loginStatusPretty = JSON.stringify(result, null, 2);
+              });
           }
-
-          main.getLoginStatus = fbLoaded.promise
-            .then(getLoginStatus)
-            .then(function(result) {
-              console.log('OK: resolved:', result);
-              main.loginStatus = result;
-            });
         })
     </script>
 
@@ -71,7 +94,7 @@
 
       <div class="section">
         <b>Facebook Status:</b>
-        <pre>loginStatus = {{ main.loginStatus }};</pre>
+        <pre>loginStatus = {{ main.loginStatusPretty }};</pre>
       </div>
 
       <div class="section">
