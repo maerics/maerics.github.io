@@ -20,7 +20,7 @@
         .factory('fbService', function($q, $rootScope, $window) {
           $rootScope.fb = {
             user: null,
-            loginStatus: null,
+            login: null,
           };
 
           var fbLoaded = $q.defer();
@@ -51,14 +51,13 @@
             ready:   fbLoaded.promise,
             resolve: fbLoaded.resolve,
 
+            me:             p('me',             r => FB.api('/me?fields=name,email', r), result => $rootScope.fb.user = me),
             login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
             logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
             getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), function(result) {
-              $rootScope.fb.loginStatus = result;
+              $rootScope.fb.login = result;
               if (result.status === 'connected') {
-                return fbService.api('/me?fields=name,email')
-                  .then(me => $rootScope.fb.user = me)
-                  .then(result);
+                return fbService.me().then(result);
               }
               return result;
             }),
@@ -113,9 +112,15 @@
       </div>
 
       <div class="section">
-        <button class="btn btn-sm btn-primary" ng-click="main.getLoginStatus()">Check Login Status</button>
-        <button class="btn btn-sm btn-primary" ng-click="main.login()">Login using Facebook</button>
-        <button class="btn btn-sm btn-primary" ng-click="main.logout()">Logout</button>
+        <button class="btn btn-sm btn-primary" ng-click="main.login()" ng-if="fb.login.status !== 'connected'">
+          Login using Facebook
+        </button>
+        <button class="btn btn-sm btn-primary" ng-click="main.logout()" ng-if="fb.login.status !== 'connected'">
+          Logout
+        </button>
+        <button class="btn btn-sm btn-primary" ng-click="main.getLoginStatus()">
+          Check Login Status
+        </button>
       </div>
     </div>
   </body>
