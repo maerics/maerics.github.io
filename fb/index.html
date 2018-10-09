@@ -51,7 +51,7 @@
             ready:   fbLoaded.promise,
             resolve: fbLoaded.resolve,
 
-            me:             p('me',             r => FB.api('/me?fields=name,email', r), result => $rootScope.fb.user = result),
+            me:             p('me',             r => FB.api('/me?fields=name,email,picture', r), result => $rootScope.fb.user = result),
             picture:        p('picture',        r => FB.api(`/${$rootScope.fb.user.id}/picture`, r)),
             login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
             logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
