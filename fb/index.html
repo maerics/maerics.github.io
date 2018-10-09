@@ -101,24 +101,22 @@
           main.login          = fbService.login;
           main.logout         = fbService.logout;
           main.getLoginStatus = fbService.getLoginStatus;
+          main.picture        = fbService.picture;
         })
     </script>
 
     <!-- Body HTML content. -->
     <div ng-controller="MainCtrl as main">
       <h1>Facebook API Playground</h1>
-
-      <div class="section">
-        <b>Facebook Status:</b>
-        <pre>{{ fb | jsonpp }};</pre>
-      </div>
-
       <div class="section">
         <button class="btn btn-sm btn-primary" ng-click="main.login()" ng-if="fb.login.status !== 'connected'">
           Login using Facebook
         </button>
         <button class="btn btn-sm btn-primary" ng-click="main.logout()" ng-if="fb.login.status === 'connected'">
           Logout
+        </button>
+        <button class="btn btn-sm btn-info" ng-click="main.picture()">
+          Load Picture
         </button>
         <button class="btn btn-sm btn-link" ng-click="main.getLoginStatus()">
           Reload Login Status
@@ -128,6 +126,15 @@
       <div class="section" ng-if="fb.user">
         <h3>Hello, {{ fb.user.name }}!</h3>
         <div>Your email address is {{ fb.user.email }}</div>
+      </div>
+
+      <div class="section" ng-init="main.showingStatus=true">
+        <span>
+          <b>Facebook Status:</b>
+          <a href="#" class="badge badge-primary" ng-if="!main.showingStatus" ng-click="main.showingStatus=true">Show</a>
+          <a href="#" class="badge badge-primary" ng-if="main.showingStatus"  ng-click="main.showingStatus=false">Hide</a>
+        </span>
+        <pre ng-if="main.showingStatus">{{ fb | jsonpp }};</pre>
       </div>
     </div>
   </body>
