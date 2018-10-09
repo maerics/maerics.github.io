@@ -52,7 +52,6 @@
             resolve: fbLoaded.resolve,
 
             me:             p('me',             r => FB.api('/me?fields=name,email,picture', r), result => $rootScope.fb.user = result),
-            picture:        p('picture',        r => FB.api(`/${$rootScope.fb.user.id}/picture`, r)),
             login:          p('login',          r => FB.login(r),          result => fbService.getLoginStatus().then(result)),
             logout:         p('logout',         r => FB.logout(r),         result => fbService.getLoginStatus().then(result)),
             getLoginStatus: p('getLoginStatus', r => FB.getLoginStatus(r), function(result) {
@@ -101,7 +100,6 @@
           main.login          = fbService.login;
           main.logout         = fbService.logout;
           main.getLoginStatus = fbService.getLoginStatus;
-          main.picture        = fbService.picture;
         })
     </script>
 
@@ -123,7 +121,7 @@
       <div class="section" ng-if="fb.user">
         <h3>Hello, {{ fb.user.name }}!</h3>
         <div style="float: left; ">
-          <img style="1px solid black; margin: 5px; "
+          <img style="border: 1px solid black; margin-right: 5px; "
                height="{{ fb.user.picture.data.height }}"
                width="{{ fb.user.picture.data.width }}"
                src="{{ fb.user.picture.data.url }}">
