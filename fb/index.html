@@ -52,7 +52,7 @@
             ready:   fbLoaded.promise,
             resolve: fbLoaded.resolve,
 
-            me:             p('me',             r => FB.api('/me?fields=name,email,picture', r), function(result) {
+            me:             p('me',             r => FB.api('/me?fields=name,email', r), function(result) {
               $rootScope.fb.updatedAt = new Date()
               $rootScope.fb.user = result;
               return result;
@@ -121,12 +121,12 @@
 
       <div ng-if="fb.user">
         <h1 class="display-4">Hello, {{ fb.user.name }}!</h1>
-        <div style="float: left; ">
+        <!--div style="float: left; ">
           <img style="border: 1px solid black; margin-right: 5px; "
                height="{{ fb.user.picture.data.height }}"
                width="{{ fb.user.picture.data.width }}"
                src="{{ fb.user.picture.data.url }}">
-        </div>
+        </div-->
         <div>Your email address is<br><b>{{ fb.user.email }}</b><br clear="all"></div>
       </div>
 
