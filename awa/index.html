@@ -8,13 +8,15 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.min.js" integrity="sha256-QRJz3b0/ZZC4ilKmBRRjY0MgnVhQ+RR1tpWLYaRRjSo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.min.js" integrity="sha256-QRJz3b0/ZZC4ilKmBRRjY0MgnVhQ+RR1tpWLYaRRjSo=" crossorigin="anonymous"></script>
+
+    <!-- AngularJS UI Bootstrap -->
+    <script src="ui-bootstrap-tpls-2.5.0.min.js"></script>
+    <link rel="stylesheet" href="ui-bootstrap-2.5.0-csp.css">
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css">
-    <style>
-    </style>
   </head>
 
   <body class="text-center" ng-app="awa">
@@ -25,7 +27,7 @@
       <main role="main" class="inner cover">
         <div class="mb-5">
           <h3>The Most Rapid and Direct Means to Eternal Bliss</h3>
-          <h2 class="darker" ng-click="awa.openChapter7()">
+          <h2 class="darker" ng-click="awa.openChapter7()" uib-tooltip="foo">
             Chapter 7
           </h2>
           <h4 ng-click="awa.openChapter7()">
@@ -37,11 +39,12 @@
         </div>
         <form class="form">
           <select class="custom-select mb-2"
+              uib-tooltip="Testing"
               ng-options="clip.src as clip.title for clip in awa.clips"
               ng-init="awa.clip = awa.clips[0].src"
               ng-model="awa.clip">
           </select>
-          <!-- $ ffmpeg -i foo.m4a -acodec libmp3lame -aq 2 bar.mp3 -->
+          <!-- $ ffmpeg -i foo.m4a -acodec libmp3lame -aq 9 bar.mp3 -->
           <audio class="mb-5" controls ng-attr-src="{{ awa.clip }}"></audio>
           <div>
             <h1 class="display-4" ng-cloak ng-click="awa.cancel()">
@@ -61,7 +64,7 @@
     const DEFAULT_PERIOD_MILLIS = 30 * 60 * 1000
 
     angular
-      .module('awa', [])
+      .module('awa', ['ui.bootstrap'])
       .controller('awaCtrl', function($interval, $log, $scope, $timeout, $window) {
         var awa = this
 
