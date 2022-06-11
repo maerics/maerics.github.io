@@ -17,8 +17,18 @@
       text-align: center;
     }
 
+    input[type=color] {
+      border-left: 0;
+      max-width: 40px;
+    }
+
+    .color-btn {
+      border: 1px solid #ced4da;
+      border-right: 0;
+    }
+
     .container {
-      max-width: 810px;
+      max-width: 820px;
       margin: auto;
     }
   </style>
@@ -32,6 +42,14 @@
       <button class="btn btn-success" type="button" id="download-button">Download PNG</button>
     </div>
     <div class="input-group input-group-sm mb-3">
+      <button id="color-btn-fg" class="btn btn-outline-secondary color-btn">
+        Color
+      </button>
+      <input id="color-fg" type="color" class="form-control form-control-color" id="foreground-color" value="#000000"
+        title="Foreground color">
+      <button id="color-btn-bg" class="btn btn-outline-secondary color-btn">Background</button>
+      <input id="color-bg" type="color" class="form-control form-control-color" id="background-color" value="#ffffff"
+        title="background color">
       <select class="form-select" id="recovery-level">
         <option value="L">Recovery: Low</option>
         <option value="M" selected>Recovery: Med</option>
@@ -56,6 +74,14 @@
     const $recovery = document.getElementById('recovery-level')
     const $margin = document.getElementById('margin')
 
+    const $colorFG = document.getElementById('color-fg')
+    const $colorBtnFG = document.getElementById('color-btn-fg')
+    $colorBtnFG.addEventListener('click', () => $colorFG.click())
+
+    const $colorBG = document.getElementById('color-bg')
+    const $colorBtnBG = document.getElementById('color-btn-bg')
+    $colorBtnBG.addEventListener('click', () => $colorBG.click())
+
     const generateCode = (() => {
       const context2d = $canvas.getContext('2d')
       return (targetContent) => {
@@ -67,6 +93,9 @@
             margin: parseInt($margin.value),
             width: 800,
           }
+          const fg = $colorFG.value || '#000000'
+          const bg = ($colorBG.value === '#ffffff') ? '#0000' : $colorBG.value
+          options.color = { dark: fg, light: bg }
           console.debug('OPTIONS', options)
 
           QRCode.toCanvas($canvas, targetContent, options)
@@ -81,6 +110,8 @@
     $url.addEventListener('keyup', render)
     $margin.addEventListener('change', render)
     $recovery.addEventListener('change', render)
+    $colorBG.addEventListener('change', render)
+    $colorFG.addEventListener('change', render)
 
     document.getElementById('download-button')
       .addEventListener('click', (ev) => {
