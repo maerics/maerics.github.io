@@ -30,7 +30,6 @@
     <div class="input-group input-group-lg mb-3">
       <input id="target-url" type="text" class="form-control" placeholder="Target URL">
       <button class="btn btn-success" type="button" id="download-button">Download PNG</button>
-
     </div>
     <canvas id="canvas"></canvas>
   </div>
@@ -50,8 +49,8 @@
           context2d.clearRect(0, 0, 1e3, 1e3)
         } else {
           QRCode.toCanvas($canvas, targetContent, options)
-            .then(_ => console.debug('DONE:', targetContent))
-            .catch(err => console.error('ERROR:', err))
+            .then(() => console.debug('DONE:', targetContent))
+            .catch((err) => console.error('ERROR:', err))
         }
       }
     })()
@@ -61,10 +60,10 @@
 
     document.getElementById('download-button')
       .addEventListener('click', (ev) => {
-        const $link = document.createElement('a');
+        const $link = document.createElement('a')
         $link.download = 'qrcode-' + new Date().toISOString().replace(/[^\dTZ\.]/g, '') + '.png'
         $link.href = $canvas.toDataURL()
-        $link.click();
+        $link.click()
       })
   </script>
 </body>
