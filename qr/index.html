@@ -27,6 +27,12 @@
       border-right: 0;
     }
 
+    select,
+    .color-btn {
+      color: rgb(108, 117, 125) !important;
+      padding-left: 1rem !important;
+    }
+
     .container {
       max-width: 820px;
       margin: auto;
@@ -61,7 +67,7 @@
         <option value="1" selected>Margin: 1</option>
         <option value="2">Margin: 2</option>
         <option value="3">Margin: 3</option>
-        <option value="3">Margin: 4</option>
+        <option value="4">Margin: 4</option>
       </select>
     </div>
     <canvas id="canvas"></canvas>
@@ -113,13 +119,15 @@
     $colorBG.addEventListener('change', render)
     $colorFG.addEventListener('change', render)
 
-    document.getElementById('download-button')
-      .addEventListener('click', (ev) => {
-        const $link = document.createElement('a')
-        $link.download = 'qrcode-' + new Date().toISOString().replace(/[^\dTZ\.]/g, '') + '.png'
-        $link.href = $canvas.toDataURL()
-        $link.click()
-      })
+    const $downloadButton = document.getElementById('download-button')
+    $downloadButton.addEventListener('click', (ev) => {
+      const $link = document.createElement('a')
+      $link.download = 'qrcode-' + new Date().toISOString().replace(/[^\dTZ\.]/g, '') + '.png'
+      $link.href = $canvas.toDataURL()
+      $link.click()
+    })
+
+    $url.focus()
   </script>
 </body>
 
